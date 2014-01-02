@@ -1,0 +1,9 @@
+*.swp
+*.pyc
+*.pdf
+*.counts*
+*.dev*
+*.key
+*.gene
+*.out
+*.train*
