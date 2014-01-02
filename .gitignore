@@ -7,3 +7,4 @@
 *.gene
 *.out
 *.train*
+*.test
