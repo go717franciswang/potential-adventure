@@ -117,7 +117,7 @@ class Part1:
 if __name__ == '__main__':
     p = Part1()
     # `python count_freqs.py gene.train > gene.counts`
-    # p.map_infreq_words_in_training_data(5)
+    # p.map_infreq_words_in_training_data()
     # `python count_freqs.py gene.train_rare > gene.counts_rare`
     p.load_count_freqs_file('gene.counts_rare')
     # p.gen_baseline('gene.dev', 'gene_dev.p1.out')
