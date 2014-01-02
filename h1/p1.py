@@ -2,11 +2,12 @@
 
 class Part1:
     def __init__(self):
-        self.wordtag = {}
-        self.igram = {}
+        self.tag_word_count = {}
+        self.ngram = {}
         self.wordcount = {}
         self.infrequent_wordcount = {}
         self.tags = set()
+        self.freq_threshold = 5
 
     def load_count_freqs_file(self, file_path):
         filein = file(file_path, 'r')
@@ -22,7 +23,7 @@ class Part1:
                 if category == 'WORDTAG':
                     tag = items[2]
                     word = items[3]
-                    self.wordtag[(tag,word)] = count
+                    self.tag_word_count[(tag,word)] = count
 
                     if not self.wordcount.has_key(word):
                         self.wordcount[word] = 0
@@ -32,41 +33,45 @@ class Part1:
                     i = int(category[0])
                     tags = items[2:]
                     key = tuple([i] + tags)
-                    self.igram[key] = count
+                    self.ngram[key] = count
 
                     for tag in tags:
                         self.tags.add(tag)
 
             line = filein.readline()
 
-    def get_emission(self, x, y):
-        if self.wordtag.has_key((y,x)):
-            return float(self.wordtag[(y,x)]) / self.igram[(1,y)]
-        elif self.wordtag.has_key((y,'_RARE_')):
-            return float(self.wordtag[(y,'_RARE_')]) / self.igram[(1,y)]
+    def e(self, x, y):
+        if self.is_rare(x):
+            x = '_RARE_'
+
+        if self.tag_word_count.has_key((y,x)):
+            return float(self.tag_word_count[(y,x)]) / self.ngram[(1,y)]
         else:
             return 0
+
+    def is_rare(self, x):
+        return not (self.wordcount.has_key(x) and self.wordcount[x] >= self.freq_threshold)
 
     def get_op_tag(self, x):
         max_emission = 0
         op_tag = ''
 
         for tag in self.tags:
-            e = self.get_emission(x, tag)
+            e = self.e(x, tag)
             if e > max_emission:
                 max_emission = e
                 op_tag = tag
 
         return op_tag
 
-    def map_infreq_words_in_training_data(self, freq_threshold):
+    def map_infreq_words_in_training_data(self):
         self.load_count_freqs_file('gene.counts')
-        self.get_infrequent_word_count(freq_threshold)
+        self.get_infrequent_word_count()
         self.transform_training_data()
 
-    def get_infrequent_word_count(self, freq_threshold):
+    def get_infrequent_word_count(self):
         for (word,count) in self.wordcount.items():
-            if count < freq_threshold:
+            if count < self.freq_threshold:
                 self.infrequent_wordcount[word] = count
 
     def transform_training_data(self):
@@ -83,6 +88,8 @@ class Part1:
 
                 line = ' '.join(items) + '\n'
                 fileout.write(line)
+            else:
+                fileout.write('\n')
 
             line = filein.readline()
 
