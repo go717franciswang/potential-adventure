@@ -42,7 +42,7 @@ class Part1:
 
     def e(self, x, y):
         if self.is_rare(x):
-            x = '_RARE_'
+            x = self.get_rare_replacement(x)
 
         if self.tag_word_count.has_key((y,x)):
             return float(self.tag_word_count[(y,x)]) / self.ngram[(1,y)]
@@ -51,6 +51,9 @@ class Part1:
 
     def is_rare(self, x):
         return not (self.wordcount.has_key(x) and self.wordcount[x] >= self.freq_threshold)
+
+    def get_rare_replacement(self, x):
+        return '_RARE_'
 
     def get_op_tag(self, x):
         max_emission = 0
@@ -64,19 +67,19 @@ class Part1:
 
         return op_tag
 
-    def map_infreq_words_in_training_data(self):
+    def map_infreq_words_in_training_data(self, transformed_file_path):
         self.load_count_freqs_file('gene.counts')
         self.get_infrequent_word_count()
-        self.transform_training_data()
+        self.transform_training_data(transformed_file_path)
 
     def get_infrequent_word_count(self):
         for (word,count) in self.wordcount.items():
             if count < self.freq_threshold:
                 self.infrequent_wordcount[word] = count
 
-    def transform_training_data(self):
+    def transform_training_data(self, transformed_file_path):
         filein = file('gene.train', 'r')
-        fileout = file('gene.train_rare', 'w')
+        fileout = file(transformed_file_path, 'w')
         line = filein.readline()
 
         while line:
@@ -84,7 +87,7 @@ class Part1:
             if line:
                 items = line.split(' ')
                 if self.infrequent_wordcount.has_key(items[0]):
-                    items[0] = '_RARE_'
+                    items[0] = self.get_rare_replacement(items[0])
 
                 line = ' '.join(items) + '\n'
                 fileout.write(line)
@@ -117,7 +120,7 @@ class Part1:
 if __name__ == '__main__':
     p = Part1()
     # `python count_freqs.py gene.train > gene.counts`
-    # p.map_infreq_words_in_training_data()
+    # p.map_infreq_words_in_training_data('gene.train_rare')
     # `python count_freqs.py gene.train_rare > gene.counts_rare`
     p.load_count_freqs_file('gene.counts_rare')
     # p.gen_baseline('gene.dev', 'gene_dev.p1.out')

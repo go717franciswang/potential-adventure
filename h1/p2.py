@@ -42,7 +42,7 @@ class Part2(Part1):
                     if k < length:
                         x = words[k]
                         if self.is_rare(x):
-                            x = '_RARE_'
+                            x = self.get_rare_replacement(x)
                         e = self.e(x,w)
 
                     for v in self.S(k-2, length):
@@ -100,6 +100,6 @@ if __name__ == '__main__':
     p = Part2()
     p.load_count_freqs_file('gene.counts_rare')
     # p.gen_viterbi_tags('gene.dev', 'gene_dev.p2.out')
-    # `python eval_gene_tagger.py gene.key gene_dev.p1.out`
+    # `python eval_gene_tagger.py gene.key gene_dev.p2.out`
     p.gen_viterbi_tags('gene.test', 'gene_test.p2.out')
 
